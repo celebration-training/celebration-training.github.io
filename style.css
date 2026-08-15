@@ -1,0 +1,218 @@
+/* -------------------- */
+/* RESET */
+/* -------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #25291d 0%,
+            #14160f 45%,
+            #080906 100%
+        );
+
+    color: #e8e4d5;
+
+    font-family: "Stardos Stencil", serif;
+
+    min-height: 100vh;
+}
+
+
+/* -------------------- */
+/* BACKGROUND TEXTURE */
+/* -------------------- */
+
+body::before {
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: 0.12;
+
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            rgba(255,255,255,0.06) 4px
+        );
+
+    z-index: 100;
+}
+
+
+/* -------------------- */
+/* MAIN PAGE */
+/* -------------------- */
+
+.hero {
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    padding: 40px 20px;
+}
+
+
+/* -------------------- */
+/* SMALL HEADER */
+/* -------------------- */
+
+.small-title {
+    font-size: 20px;
+
+    letter-spacing: 6px;
+
+    margin-bottom: 10px;
+
+    color: #a7a48f;
+}
+
+
+/* -------------------- */
+/* MAIN TITLE */
+/* -------------------- */
+
+h1 {
+    margin: 0;
+
+    font-size: clamp(65px, 11vw, 150px);
+
+    line-height: 0.85;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+
+    color: #eeeadd;
+
+    text-shadow:
+        3px 3px 0 #111,
+        -1px -1px 0 rgba(255,255,255,0.15),
+        6px 6px 10px rgba(0,0,0,0.8);
+}
+
+
+/* -------------------- */
+/* SUBTITLE */
+/* -------------------- */
+
+.subtitle {
+    margin-top: 35px;
+
+    margin-bottom: 35px;
+
+    font-size: 25px;
+
+    letter-spacing: 5px;
+
+    color: #b6b19c;
+}
+
+
+/* -------------------- */
+/* BUTTON */
+/* -------------------- */
+
+.training-button {
+    display: inline-block;
+
+    padding: 16px 36px;
+
+    border: 3px solid #d8d4c4;
+
+    color: #e8e4d5;
+
+    text-decoration: none;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+
+    transition: 0.15s;
+}
+
+.training-button:hover {
+    background: #d8d4c4;
+
+    color: #111;
+
+    transform: scale(1.04);
+}
+
+
+/* -------------------- */
+/* MILITARY LINES */
+/* -------------------- */
+
+.top-line,
+.bottom-line {
+    width: min(700px, 80vw);
+
+    height: 4px;
+
+    background: #777763;
+
+    margin: 30px 0;
+}
+
+.top-line {
+    margin-bottom: 25px;
+}
+
+.bottom-line {
+    margin-top: 45px;
+}
+
+
+/* -------------------- */
+/* PHONE SUPPORT */
+/* -------------------- */
+
+@media (max-width: 600px) {
+
+    .small-title {
+        font-size: 14px;
+
+        letter-spacing: 3px;
+    }
+
+    .subtitle {
+        font-size: 17px;
+
+        letter-spacing: 3px;
+    }
+
+    .training-button {
+        font-size: 18px;
+
+        padding: 14px 25px;
+    }
+}
