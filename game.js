@@ -418,7 +418,7 @@ const cardInkMaterial =
 
 
 // =====================================================
-// BOX MAKER
+// GEOMETRY HELPERS
 // =====================================================
 
 function makeBox(
@@ -467,10 +467,6 @@ function makeBox(
 
 }
 
-
-// =====================================================
-// CYLINDER MAKER
-// =====================================================
 
 function makeCylinder(
     radiusTop,
@@ -521,8 +517,55 @@ function makeCylinder(
 }
 
 
+function makeSphere(
+    radius,
+    material,
+    x,
+    y,
+    z,
+    parent = scene,
+    widthSegments = 16,
+    heightSegments = 12
+) {
+
+    const mesh =
+        new THREE.Mesh(
+
+            new THREE.SphereGeometry(
+                radius,
+                widthSegments,
+                heightSegments
+            ),
+
+            material
+
+        );
+
+
+    mesh.position.set(
+        x,
+        y,
+        z
+    );
+
+
+    mesh.castShadow = true;
+
+    mesh.receiveShadow = true;
+
+
+    parent.add(
+        mesh
+    );
+
+
+    return mesh;
+
+}
+
+
 // =====================================================
-// ROOM SIZE
+// ROOM
 // =====================================================
 
 const roomWidth = 14;
@@ -531,10 +574,6 @@ const roomDepth = 20;
 
 const roomHeight = 4;
 
-
-// =====================================================
-// FLOOR
-// =====================================================
 
 makeBox(
     roomWidth,
@@ -547,10 +586,6 @@ makeBox(
 );
 
 
-// =====================================================
-// CEILING
-// =====================================================
-
 makeBox(
     roomWidth,
     0.2,
@@ -561,10 +596,6 @@ makeBox(
     0
 );
 
-
-// =====================================================
-// WALLS
-// =====================================================
 
 makeBox(
     roomWidth,
@@ -740,7 +771,7 @@ function addCollider(
 
 
 // =====================================================
-// TABLE MAKER
+// TABLES
 // =====================================================
 
 function createTable(
@@ -823,7 +854,7 @@ function createTable(
 
 
 // =====================================================
-// CHAIR MAKER
+// CHAIRS
 // =====================================================
 
 function createChair(
@@ -913,7 +944,7 @@ function createChair(
 
 
 // =====================================================
-// STUDENTS
+// STUDENTS — SEATED + HIGHER POLY
 // =====================================================
 
 const students = [];
@@ -951,31 +982,45 @@ function createStudent(
         ];
 
 
-    // TORSO
+    // WAIST
 
     makeBox(
-        0.48,
-        0.68,
-        0.30,
+        0.42,
+        0.16,
+        0.28,
         shirt,
         0,
-        1.05,
-        0,
+        0.72,
+        0.05,
         student
     );
 
 
-    // HEAD
+    // TORSO
 
     makeBox(
-        0.38,
-        0.38,
-        0.36,
+        0.50,
+        0.50,
+        0.30,
+        shirt,
+        0,
+        1.02,
+        0.04,
+        student
+    );
+
+
+    // ROUND HEAD
+
+    makeSphere(
+        0.20,
         skin,
         0,
-        1.58,
-        -0.02,
-        student
+        1.43,
+        -0.01,
+        student,
+        16,
+        12
     );
 
 
@@ -983,11 +1028,35 @@ function createStudent(
 
     makeBox(
         0.40,
-        0.14,
-        0.38,
+        0.10,
+        0.36,
         hair,
         0,
-        1.77,
+        1.58,
+        -0.01,
+        student
+    );
+
+
+    makeBox(
+        0.08,
+        0.22,
+        0.34,
+        hair,
+        -0.20,
+        1.43,
+        -0.01,
+        student
+    );
+
+
+    makeBox(
+        0.08,
+        0.22,
+        0.34,
+        hair,
+        0.20,
+        1.43,
         -0.01,
         student
     );
@@ -995,52 +1064,130 @@ function createStudent(
 
     // ARMS
 
-    makeBox(
-        0.13,
-        0.48,
-        0.13,
-        skin,
-        -0.31,
-        1.00,
-        -0.08,
-        student
+    const leftArm =
+        makeCylinder(
+            0.055,
+            0.055,
+            0.38,
+            skin,
+            -0.34,
+            0.98,
+            -0.02,
+            student,
+            10
+        );
+
+
+    leftArm.rotation.z =
+        0.18;
+
+
+    const rightArm =
+        makeCylinder(
+            0.055,
+            0.055,
+            0.38,
+            skin,
+            0.34,
+            0.98,
+            -0.02,
+            student,
+            10
+        );
+
+
+    rightArm.rotation.z =
+        -0.18;
+
+
+    // THIGHS — HORIZONTAL FOR SITTING
+
+    const leftThigh =
+        makeCylinder(
+            0.07,
+            0.07,
+            0.42,
+            blackMaterial,
+            -0.13,
+            0.61,
+            -0.10,
+            student,
+            10
+        );
+
+
+    leftThigh.rotation.x =
+        Math.PI / 2;
+
+
+    const rightThigh =
+        makeCylinder(
+            0.07,
+            0.07,
+            0.42,
+            blackMaterial,
+            0.13,
+            0.61,
+            -0.10,
+            student,
+            10
+        );
+
+
+    rightThigh.rotation.x =
+        Math.PI / 2;
+
+
+    // LOWER LEGS
+
+    makeCylinder(
+        0.06,
+        0.06,
+        0.42,
+        blackMaterial,
+        -0.13,
+        0.30,
+        -0.28,
+        student,
+        10
     );
 
 
-    makeBox(
+    makeCylinder(
+        0.06,
+        0.06,
+        0.42,
+        blackMaterial,
         0.13,
-        0.48,
-        0.13,
-        skin,
-        0.31,
-        1.00,
-        -0.08,
-        student
+        0.30,
+        -0.28,
+        student,
+        10
     );
 
 
-    // LEGS
+    // FEET
 
     makeBox(
         0.16,
-        0.52,
-        0.18,
+        0.08,
+        0.24,
         blackMaterial,
-        -0.14,
-        0.52,
-        -0.05,
+        -0.13,
+        0.08,
+        -0.20,
         student
     );
 
 
     makeBox(
         0.16,
-        0.52,
-        0.18,
+        0.08,
+        0.24,
         blackMaterial,
-        0.14,
-        0.52,
-        -0.05,
+        0.13,
+        0.08,
+        -0.20,
         student
     );
 
@@ -1072,6 +1219,8 @@ function createStudent(
 
         z,
 
+        rotation,
+
         hasCupcake:
             false
 
@@ -1081,10 +1230,11 @@ function createStudent(
 
 
 // =====================================================
-// TABLE + FOUR CHAIRS
+// CLASSROOM TABLES
 // =====================================================
 
-let studentCounter = 0;
+let studentCounter =
+    0;
 
 
 function classroomTable(
@@ -1165,17 +1315,6 @@ function classroomTable(
 }
 
 
-// =====================================================
-// CLASSROOM LAYOUT
-// =====================================================
-//
-// 24 CHAIRS TOTAL.
-//
-// 20 STUDENTS.
-//
-// FOUR CHAIRS ARE LEFT EMPTY.
-//
-
 classroomTable(
     -2.8,
     -5,
@@ -1219,7 +1358,7 @@ classroomTable(
 
 
 // =====================================================
-// MRS. SISSOM'S DESK
+// MRS. SISSOM DESK
 // =====================================================
 
 makeBox(
@@ -1285,14 +1424,7 @@ addCollider(
 );
 
 
-// =====================================================
 // TEACHER CHAIR
-// =====================================================
-//
-// CHANGED FROM Math.PI TO 0.
-//
-// NOW IT FACES THE DESK.
-//
 
 createChair(
     4.6,
@@ -1311,11 +1443,11 @@ function createTeacher() {
         new THREE.Group();
 
 
-    // DARK TOP
+    // TORSO
 
     makeBox(
-        0.60,
-        0.78,
+        0.62,
+        0.76,
         0.36,
         teacherShirtMaterial,
         0,
@@ -1325,82 +1457,94 @@ function createTeacher() {
     );
 
 
-    // HEAD
+    // ROUND FACE
 
-    makeBox(
-        0.44,
-        0.42,
-        0.40,
+    makeSphere(
+        0.22,
         skinMaterials[0],
         0,
         1.66,
         -0.03,
-        teacher
+        teacher,
+        18,
+        14
     );
 
 
-    // LIGHT HAIR
+    // HAIR
 
-    makeBox(
-        0.48,
-        0.16,
-        0.43,
+    makeSphere(
+        0.235,
         teacherHairMaterial,
         0,
-        1.88,
-        -0.01,
-        teacher
+        1.72,
+        0.01,
+        teacher,
+        18,
+        12
     );
 
 
     makeBox(
-        0.10,
-        0.32,
-        0.42,
+        0.14,
+        0.34,
+        0.38,
         teacherHairMaterial,
         -0.23,
-        1.70,
-        -0.01,
+        1.66,
+        0,
         teacher
     );
 
 
     makeBox(
-        0.10,
-        0.32,
-        0.42,
+        0.14,
+        0.34,
+        0.38,
         teacherHairMaterial,
         0.23,
-        1.70,
-        -0.01,
+        1.66,
+        0,
         teacher
     );
 
 
     // ARMS
 
-    makeBox(
-        0.14,
-        0.52,
-        0.14,
-        skinMaterials[0],
-        -0.37,
-        1.02,
-        -0.04,
-        teacher
-    );
+    const leftArm =
+        makeCylinder(
+            0.065,
+            0.065,
+            0.52,
+            skinMaterials[0],
+            -0.38,
+            1.02,
+            -0.02,
+            teacher,
+            12
+        );
 
 
-    makeBox(
-        0.14,
-        0.52,
-        0.14,
-        skinMaterials[0],
-        0.37,
-        1.02,
-        -0.04,
-        teacher
-    );
+    leftArm.rotation.z =
+        0.08;
+
+
+    const rightArm =
+        makeCylinder(
+            0.065,
+            0.065,
+            0.52,
+            skinMaterials[0],
+            0.38,
+            1.02,
+            -0.02,
+            teacher,
+            12
+        );
+
+
+    rightArm.rotation.z =
+        -0.08;
 
 
     teacher.position.set(
@@ -1425,7 +1569,7 @@ createTeacher();
 
 
 // =====================================================
-// CUPCAKE MAKER
+// CUPCAKES
 // =====================================================
 
 function createCupcake(
@@ -1446,20 +1590,20 @@ function createCupcake(
         0,
         0.075,
         0,
-        cupcake
+        cupcake,
+        14
     );
 
 
-    makeCylinder(
-        0.11,
-        0.06,
-        0.12,
+    makeSphere(
+        0.105,
         cupcakeFrostingMaterial,
         0,
-        0.20,
+        0.18,
         0,
         cupcake,
-        16
+        14,
+        10
     );
 
 
@@ -1480,9 +1624,7 @@ function createCupcake(
 }
 
 
-// =====================================================
 // CUPCAKES ON TEACHER DESK
-// =====================================================
 
 for (
     let i = 0;
@@ -1552,7 +1694,7 @@ scene.add(
 
 
 // =====================================================
-// CARD PASSING SYSTEM
+// CARD SYSTEM
 // =====================================================
 
 let cardStudentIndex =
@@ -1593,16 +1735,43 @@ function updateCardPosition() {
         ];
 
 
+    const offset =
+        new THREE.Vector3(
+            0,
+            0,
+            -0.48
+        );
+
+
+    offset.applyAxisAngle(
+
+        new THREE.Vector3(
+            0,
+            1,
+            0
+        ),
+
+        student.rotation
+
+    );
+
+
     card.position.set(
-        student.x,
-        1.15,
-        student.z
+
+        student.x +
+        offset.x,
+
+        1.02,
+
+        student.z +
+        offset.z
+
     );
 
 
     card.rotation.set(
         0,
-        0,
+        -student.rotation,
         0
     );
 
@@ -1645,7 +1814,7 @@ function advanceCard() {
 
         showMessage(
             "ALL 20 STUDENTS SIGNED THE CARD.",
-            2500
+            1800
         );
 
     }
@@ -1656,8 +1825,8 @@ function advanceCard() {
 
 
         showMessage(
-            `STUDENT ${cardSignedCount} SIGNED — CARD PASSED ON.`,
-            1400
+            `CARD PASSED — ${cardSignedCount} / 20 SIGNED`,
+            900
         );
 
     }
@@ -1744,7 +1913,7 @@ document.body.appendChild(
 
 
 // =====================================================
-// OBJECTIVE TEXT
+// OBJECTIVE
 // =====================================================
 
 const objective =
@@ -1912,7 +2081,7 @@ messageText.style.color =
 
 
 messageText.style.fontSize =
-    "28px";
+    "26px";
 
 
 messageText.style.letterSpacing =
@@ -2004,7 +2173,7 @@ document.body.appendChild(
 
 
 // =====================================================
-// TEMPORARY MESSAGES
+// MESSAGES
 // =====================================================
 
 let messageTimeout =
@@ -2013,7 +2182,7 @@ let messageTimeout =
 
 function showMessage(
     text,
-    duration = 1300
+    duration = 1000
 ) {
 
     messageText.textContent =
@@ -2051,7 +2220,7 @@ function showMessage(
 
 
 // =====================================================
-// GAME SETTINGS
+// GAMEPLAY
 // =====================================================
 
 const GAME_TIME =
@@ -2071,7 +2240,7 @@ let nearestStudent =
 
 
 const interactionDistance =
-    1.55;
+    1.85;
 
 
 // =====================================================
@@ -2130,34 +2299,35 @@ function startGame() {
 
     showMessage(
         "TRAINING STARTED — 1:45 ON THE CLOCK.",
-        2200
+        1800
     );
 
 }
 
 
 // =====================================================
-// UPDATE HUD
+// HUD UPDATE
 // =====================================================
 
 function updateHUD() {
 
+    const safeTime =
+        Math.max(
+            0,
+            timeRemaining
+        );
+
+
     const minutes =
         Math.floor(
-            Math.max(
-                0,
-                timeRemaining
-            ) /
+            safeTime /
             60
         );
 
 
     const seconds =
         Math.floor(
-            Math.max(
-                0,
-                timeRemaining
-            ) %
+            safeTime %
             60
         )
         .toString()
@@ -2194,7 +2364,7 @@ function updateHUD() {
 
 
 // =====================================================
-// FIND STUDENT NEAR PLAYER
+// FIND NEAREST STUDENT
 // =====================================================
 
 function findNearestStudent() {
@@ -2266,7 +2436,7 @@ function findNearestStudent() {
 
 
 // =====================================================
-// DELIVER CUPCAKE
+// GIVE CUPCAKE
 // =====================================================
 
 function deliverCupcake(
@@ -2291,22 +2461,43 @@ function deliverCupcake(
     cupcakesDelivered++;
 
 
-    const side =
-        student.x < 0
-            ? 0.40
-            : -0.40;
+    const offset =
+        new THREE.Vector3(
+            0,
+            0,
+            -0.48
+        );
+
+
+    offset.applyAxisAngle(
+
+        new THREE.Vector3(
+            0,
+            1,
+            0
+        ),
+
+        student.rotation
+
+    );
 
 
     createCupcake(
-        student.x + side,
-        1.08,
-        student.z
+
+        student.x +
+        offset.x,
+
+        1.03,
+
+        student.z +
+        offset.z
+
     );
 
 
     showMessage(
         `CUPCAKE DELIVERED — ${cupcakesDelivered} / 20`,
-        900
+        700
     );
 
 
@@ -2458,7 +2649,7 @@ function finishGame(
 
 
 // =====================================================
-// E KEY — GIVE CUPCAKE
+// E KEY
 // =====================================================
 
 document.addEventListener(
@@ -2687,7 +2878,7 @@ function collidingWithFurniture(
 
 
 // =====================================================
-// WALL COLLISION
+// KEEP PLAYER IN ROOM
 // =====================================================
 
 function keepInsideRoom() {
@@ -2736,9 +2927,7 @@ function animate() {
         );
 
 
-    // =============================================
     // TIMER + CARD
-    // =============================================
 
     if (
         gameStarted &&
@@ -2789,9 +2978,7 @@ function animate() {
     }
 
 
-    // =============================================
     // PLAYER MOVEMENT
-    // =============================================
 
     if (
         controls.isLocked &&
@@ -2874,10 +3061,6 @@ function animate() {
 
         }
 
-
-        // =========================================
-        // INTERACTION
-        // =========================================
 
         nearestStudent =
             findNearestStudent();
