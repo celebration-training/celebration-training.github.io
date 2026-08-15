@@ -1792,42 +1792,42 @@ function updateCardPosition() {
 updateCardPosition();
 
 
-function advanceCard() {
-
-    if (
-        cardSignedCount >=
-        students.length
-    ) {
-
-        return;
-
-    }
+nearestStudent =
+    findNearestStudent();
 
 
-    cardSignedCount++;
+if (
+    playerNearStuckCard()
+) {
+
+    promptText.textContent =
+        "PRESS E — UNSTICK CARD";
 
 
-    cardStudentIndex++;
+    promptText.style.display =
+        "block";
+
+}
+
+else if (
+    nearestStudent
+) {
+
+    promptText.textContent =
+        "PRESS E — GIVE CUPCAKE";
 
 
-    cardPassTimer =
-        0;
+    promptText.style.display =
+        "block";
 
+}
 
-    if (
-        cardSignedCount >=
-        students.length
-    ) {
+else {
 
-        card.visible =
-            false;
+    promptText.style.display =
+        "none";
 
-
-        showMessage(
-            "ALL 20 STUDENTS SIGNED THE CARD.",
-            1800
-        );
-
+}
     }
 
     else {
@@ -1851,78 +1851,45 @@ function advanceCard() {
 }
 
 
-// =====================================================
-// HUD
-// =====================================================
+function unstickCard() {
 
-const hud =
-    document.createElement(
-        "div"
+    if (
+        !cardStuck ||
+        !stuckStudent
+    ) {
+
+        return;
+
+    }
+
+
+    cardStuck =
+        false;
+
+
+    stuckStudent =
+        null;
+
+
+    cardStudentIndex++;
+
+
+    cardPassTimer =
+        0;
+
+
+    updateCardPosition();
+
+
+    showMessage(
+        "CARD MOVING AGAIN.",
+        1200
     );
 
 
-hud.style.position =
-    "fixed";
+    updateHUD();
 
-
-hud.style.left =
-    "20px";
-
-
-hud.style.top =
-    "20px";
-
-
-hud.style.zIndex =
-    "200";
-
-
-hud.style.fontFamily =
-    '"Stardos Stencil", serif';
-
-
-hud.style.color =
-    "#eeeadd";
-
-
-hud.style.fontSize =
-    "18px";
-
-
-hud.style.letterSpacing =
-    "1px";
-
-
-hud.style.textShadow =
-    "2px 2px 3px #000";
-
-
-hud.style.pointerEvents =
-    "none";
-
-
-hud.innerHTML = `
-
-    <div id="timerText">
-        TIME: 1:45
-    </div>
-
-    <div id="cupcakeText">
-        CUPCAKES: 0 / 20
-    </div>
-
-    <div id="cardText">
-        CARD SIGNATURES: 0 / 20
-    </div>
-
-`;
-
-
-document.body.appendChild(
-    hud
-);
-
-
+}
 // =====================================================
 // OBJECTIVE
 // =====================================================
@@ -2952,20 +2919,21 @@ function animate() {
         cardPassTimer +=
             delta;
 
+if (
 
-        if (
+    !cardStuck &&
 
-            cardSignedCount <
-            students.length &&
+    cardSignedCount <
+    students.length &&
 
-            cardPassTimer >=
-            cardSignTime
+    cardPassTimer >=
+    cardSignTime
 
-        ) {
+) {
 
-            advanceCard();
+    advanceCard();
 
-        }
+}
 
 
         if (
