@@ -1496,7 +1496,7 @@ function createTeacher() {
     );
 
 
-    makeBox(
+     makeBox(
         0.14,
         0.34,
         0.38,
@@ -1520,7 +1520,7 @@ function createTeacher() {
     );
 
 
-    // ARMS
+    // TEACHER ARMS
 
     const leftArm =
         makeCylinder(
@@ -1635,7 +1635,9 @@ function createCupcake(
 }
 
 
+// =====================================================
 // CUPCAKES ON TEACHER DESK
+// =====================================================
 
 for (
     let i = 0;
@@ -1644,11 +1646,8 @@ for (
 ) {
 
     createCupcake(
-        3.65 +
-        i * 0.35,
-
+        3.65 + i * 0.35,
         1.05,
-
         7.6
     );
 
@@ -1724,6 +1723,24 @@ const cardSignTime =
     2.5;
 
 
+// 15% CHANCE TO GET STUCK
+
+const cardStuckChance =
+    0.15;
+
+
+let cardStuck =
+    false;
+
+
+let stuckStudent =
+    null;
+
+
+// =====================================================
+// CARD POSITION
+// =====================================================
+
 function updateCardPosition() {
 
     if (
@@ -1733,7 +1750,6 @@ function updateCardPosition() {
 
         card.visible =
             false;
-
 
         return;
 
@@ -1792,64 +1808,115 @@ function updateCardPosition() {
 updateCardPosition();
 
 
-nearestStudent =
-    findNearestStudent();
+// =====================================================
+// ADVANCE CARD
+// =====================================================
 
+function advanceCard() {
 
-if (
-    playerNearStuckCard()
-) {
+    if (
+        cardSignedCount >=
+        students.length ||
 
-    promptText.textContent =
-        "PRESS E — UNSTICK CARD";
+        cardStuck
+    ) {
 
-
-    promptText.style.display =
-        "block";
-
-}
-
-else if (
-    nearestStudent
-) {
-
-    promptText.textContent =
-        "PRESS E — GIVE CUPCAKE";
-
-
-    promptText.style.display =
-        "block";
-
-}
-
-else {
-
-    promptText.style.display =
-        "none";
-
-}
-    
-
-    else {
-
-        updateCardPosition();
-
-
-        showMessage(
-            `CARD PASSED — ${cardSignedCount} / 20 SIGNED`,
-            900
-        );
+        return;
 
     }
 
 
+    // CURRENT STUDENT SIGNS
+
+    cardSignedCount++;
+
+
+    // EVERYONE FINISHED
+
+    if (
+        cardSignedCount >=
+        students.length
+    ) {
+
+        card.visible =
+            false;
+
+
+        showMessage(
+            "ALL 20 STUDENTS SIGNED THE CARD.",
+            1800
+        );
+
+
+        updateHUD();
+
+        checkWin();
+
+        return;
+
+    }
+
+
+    // RANDOM CHANCE THE CARD GETS STUCK
+
+    if (
+        Math.random() <
+        cardStuckChance
+    ) {
+
+        cardStuck =
+            true;
+
+
+        stuckStudent =
+            students[
+                cardStudentIndex
+            ];
+
+
+        cardPassTimer =
+            0;
+
+
+        showMessage(
+            "THE CARD GOT STUCK!",
+            1800
+        );
+
+
+        updateHUD();
+
+        return;
+
+    }
+
+
+    // NORMAL PASS
+
+    cardStudentIndex++;
+
+
+    cardPassTimer =
+        0;
+
+
+    updateCardPosition();
+
+
+    showMessage(
+        `CARD PASSED — ${cardSignedCount} / 20 SIGNED`,
+        900
+    );
+
+
     updateHUD();
-
-
-    checkWin();
 
 }
 
+
+// =====================================================
+// UNSTICK CARD
+// =====================================================
 
 function unstickCard() {
 
@@ -1890,6 +1957,80 @@ function unstickCard() {
     updateHUD();
 
 }
+
+
+// =====================================================
+// HUD
+// =====================================================
+
+const hud =
+    document.createElement(
+        "div"
+    );
+
+
+hud.style.position =
+    "fixed";
+
+
+hud.style.left =
+    "20px";
+
+
+hud.style.top =
+    "20px";
+
+
+hud.style.zIndex =
+    "200";
+
+
+hud.style.fontFamily =
+    '"Stardos Stencil", serif';
+
+
+hud.style.color =
+    "#eeeadd";
+
+
+hud.style.fontSize =
+    "18px";
+
+
+hud.style.letterSpacing =
+    "1px";
+
+
+hud.style.textShadow =
+    "2px 2px 3px #000";
+
+
+hud.style.pointerEvents =
+    "none";
+
+
+hud.innerHTML = `
+
+    <div id="timerText">
+        TIME: 1:45
+    </div>
+
+    <div id="cupcakeText">
+        CUPCAKES: 0 / 20
+    </div>
+
+    <div id="cardText">
+        CARD SIGNATURES: 0 / 20
+    </div>
+
+`;
+
+
+document.body.appendChild(
+    hud
+);
+
+
 // =====================================================
 // OBJECTIVE
 // =====================================================
@@ -2198,7 +2339,7 @@ function showMessage(
 
 
 // =====================================================
-// GAMEPLAY
+// GAMEPLAY SETTINGS
 // =====================================================
 
 const GAME_TIME =
@@ -2253,6 +2394,14 @@ function startGame() {
 
     cardPassTimer =
         0;
+
+
+    cardStuck =
+        false;
+
+
+    stuckStudent =
+        null;
 
 
     card.visible =
@@ -2336,7 +2485,12 @@ function updateHUD() {
             "cardText"
         )
         .textContent =
-        `CARD SIGNATURES: ${cardSignedCount} / 20`;
+
+        cardStuck
+
+            ? `CARD SIGNATURES: ${cardSignedCount} / 20 — STUCK!`
+
+            : `CARD SIGNATURES: ${cardSignedCount} / 20`;
 
 }
 
@@ -2409,6 +2563,43 @@ function findNearestStudent() {
 
 
     return bestStudent;
+
+}
+
+
+// =====================================================
+// CHECK IF PLAYER IS NEAR STUCK CARD
+// =====================================================
+
+function playerNearStuckCard() {
+
+    if (
+        !cardStuck ||
+        !stuckStudent
+    ) {
+
+        return false;
+
+    }
+
+
+    const dx =
+        camera.position.x -
+        stuckStudent.x;
+
+
+    const dz =
+        camera.position.z -
+        stuckStudent.z;
+
+
+    return (
+        Math.hypot(
+            dx,
+            dz
+        ) <
+        interactionDistance
+    );
 
 }
 
@@ -2636,22 +2827,40 @@ document.addEventListener(
 
         if (
 
-            event.code ===
-            "KeyE" &&
+            event.code !==
+            "KeyE" ||
 
-            gameStarted &&
+            !gameStarted ||
 
-            !gameOver &&
+            gameOver ||
 
-            controls.isLocked
+            !controls.isLocked
 
         ) {
 
-            deliverCupcake(
-                nearestStudent
-            );
+            return;
 
         }
+
+
+        // STUCK CARD GETS PRIORITY
+
+        if (
+            playerNearStuckCard()
+        ) {
+
+            unstickCard();
+
+            return;
+
+        }
+
+
+        // OTHERWISE GIVE CUPCAKE
+
+        deliverCupcake(
+            nearestStudent
+        );
 
     }
 );
@@ -2856,7 +3065,7 @@ function collidingWithFurniture(
 
 
 // =====================================================
-// KEEP PLAYER IN ROOM
+// KEEP PLAYER INSIDE ROOM
 // =====================================================
 
 function keepInsideRoom() {
@@ -2905,7 +3114,9 @@ function animate() {
         );
 
 
+    // =================================================
     // TIMER + CARD
+    // =================================================
 
     if (
         gameStarted &&
@@ -2919,21 +3130,22 @@ function animate() {
         cardPassTimer +=
             delta;
 
-if (
 
-    !cardStuck &&
+        if (
 
-    cardSignedCount <
-    students.length &&
+            !cardStuck &&
 
-    cardPassTimer >=
-    cardSignTime
+            cardSignedCount <
+            students.length &&
 
-) {
+            cardPassTimer >=
+            cardSignTime
 
-    advanceCard();
+        ) {
 
-}
+            advanceCard();
+
+        }
 
 
         if (
@@ -2957,7 +3169,9 @@ if (
     }
 
 
+    // =================================================
     // PLAYER MOVEMENT
+    // =================================================
 
     if (
         controls.isLocked &&
@@ -3041,11 +3255,28 @@ if (
         }
 
 
+        // =================================================
+        // INTERACTIONS
+        // =================================================
+
         nearestStudent =
             findNearestStudent();
 
 
         if (
+            playerNearStuckCard()
+        ) {
+
+            promptText.textContent =
+                "PRESS E — UNSTICK CARD";
+
+
+            promptText.style.display =
+                "block";
+
+        }
+
+        else if (
             nearestStudent
         ) {
 
