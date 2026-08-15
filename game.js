@@ -105,10 +105,8 @@ controls.addEventListener(
 );
 
 
-// IMPORTANT:
-//
-// Losing mouse lock will NOT throw you
-// back to the start screen anymore.
+// Losing mouse lock will NOT return you
+// to the beginning screen.
 
 controls.addEventListener(
     "unlock",
@@ -126,7 +124,7 @@ controls.addEventListener(
 );
 
 
-// Click the game to regain mouse control.
+// Click the game again to regain mouse control.
 
 renderer.domElement.addEventListener(
     "click",
@@ -473,7 +471,7 @@ createWindow(3.5);
 
 
 // ======================================================
-// TABLES
+// COLLIDERS
 // ======================================================
 
 const colliders = [];
@@ -500,6 +498,10 @@ function addCollider(
 
 }
 
+
+// ======================================================
+// TABLES
+// ======================================================
 
 function createTable(
     x,
@@ -675,7 +677,12 @@ function createChair(
     );
 
 
-    chair.rotation.y = rotation;
+    // ==================================================
+    // FLIP EVERY CHAIR 180 DEGREES
+    // ==================================================
+
+    chair.rotation.y =
+        rotation + Math.PI;
 
 
     chair.traverse(
@@ -744,7 +751,7 @@ function classroomTable(
 // CLASSROOM LAYOUT
 // ======================================================
 
-// Front row
+// FRONT ROW
 
 classroomTable(
     -2.4,
@@ -758,7 +765,7 @@ classroomTable(
 );
 
 
-// Middle row
+// MIDDLE ROW
 
 classroomTable(
     -2.4,
@@ -772,7 +779,7 @@ classroomTable(
 );
 
 
-// Back row
+// BACK ROW
 
 classroomTable(
     -2.4,
@@ -790,8 +797,6 @@ classroomTable(
 // MRS. SISSOM'S DESK
 // ======================================================
 
-// opposite back corner
-
 makeBox(
     3.7,
     0.18,
@@ -803,6 +808,8 @@ makeBox(
 );
 
 
+// DESK LEG 1
+
 makeBox(
     0.14,
     0.9,
@@ -813,6 +820,8 @@ makeBox(
     6.9
 );
 
+
+// DESK LEG 2
 
 makeBox(
     0.14,
@@ -825,6 +834,8 @@ makeBox(
 );
 
 
+// DESK LEG 3
+
 makeBox(
     0.14,
     0.9,
@@ -835,6 +846,8 @@ makeBox(
     8.3
 );
 
+
+// DESK LEG 4
 
 makeBox(
     0.14,
@@ -937,7 +950,9 @@ scene.add(
 );
 
 
-// sunlight
+// ======================================================
+// SUNLIGHT
+// ======================================================
 
 const sun =
     new THREE.DirectionalLight(
@@ -962,7 +977,7 @@ scene.add(
 
 
 // ======================================================
-// MOVEMENT
+// KEYBOARD MOVEMENT
 // ======================================================
 
 const keys = {};
@@ -989,7 +1004,7 @@ document.addEventListener(
 
 
 // ======================================================
-// COLLISION
+// PLAYER COLLISION
 // ======================================================
 
 const playerRadius = 0.32;
@@ -1032,6 +1047,10 @@ function collidingWithFurniture(
 }
 
 
+// ======================================================
+// KEEP PLAYER INSIDE CLASSROOM
+// ======================================================
+
 function keepInsideRoom() {
 
     camera.position.x =
@@ -1050,18 +1069,23 @@ function keepInsideRoom() {
         );
 
 
-    camera.position.y = 1.65;
+    camera.position.y =
+        1.65;
 
 }
 
 
 // ======================================================
-// GAME LOOP
+// CLOCK
 // ======================================================
 
 const clock =
     new THREE.Clock();
 
+
+// ======================================================
+// GAME LOOP
+// ======================================================
 
 function animate() {
 
@@ -1093,6 +1117,8 @@ function animate() {
             4.1 * delta;
 
 
+        // FORWARD
+
         if (
             keys["KeyW"]
         ) {
@@ -1103,6 +1129,8 @@ function animate() {
 
         }
 
+
+        // BACKWARD
 
         if (
             keys["KeyS"]
@@ -1115,6 +1143,8 @@ function animate() {
         }
 
 
+        // LEFT
+
         if (
             keys["KeyA"]
         ) {
@@ -1125,6 +1155,8 @@ function animate() {
 
         }
 
+
+        // RIGHT
 
         if (
             keys["KeyD"]
@@ -1137,8 +1169,12 @@ function animate() {
         }
 
 
+        // STOP PLAYER FROM WALKING OUTSIDE
+
         keepInsideRoom();
 
+
+        // STOP PLAYER FROM WALKING THROUGH TABLES
 
         if (
             collidingWithFurniture(
