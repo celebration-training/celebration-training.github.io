@@ -1,0 +1,259 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: #080a06;
+    color: #e9e5d7;
+
+    font-family: "Stardos Stencil", serif;
+}
+
+
+/* -------------------- */
+/* START SCREEN */
+/* -------------------- */
+
+#start-screen {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #25291d 0%,
+            #14160f 45%,
+            #080906 100%
+        );
+
+    z-index: 1000;
+}
+
+
+/* subtle old-screen texture */
+
+#start-screen::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: 0.12;
+
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 255, 255, 0.05) 4px
+        );
+}
+
+
+/* -------------------- */
+/* CENTER BOX */
+/* -------------------- */
+
+.start-box {
+    position: relative;
+
+    width: min(750px, 90vw);
+
+    padding: 55px 40px;
+
+    text-align: center;
+
+    border-top: 4px solid #777763;
+    border-bottom: 4px solid #777763;
+
+    z-index: 2;
+}
+
+
+.small-text {
+    margin: 0 0 15px 0;
+
+    font-size: 18px;
+
+    letter-spacing: 6px;
+
+    color: #aaa792;
+}
+
+
+h1 {
+    margin: 0 0 30px 0;
+
+    font-size: clamp(48px, 8vw, 90px);
+
+    line-height: 0.95;
+
+    letter-spacing: 2px;
+
+    color: #eeeadd;
+
+    text-shadow:
+        3px 3px 0 #111,
+        5px 5px 10px rgba(0, 0, 0, 0.8);
+}
+
+
+.start-box > p {
+    font-size: 20px;
+
+    letter-spacing: 2px;
+
+    color: #bcb8a4;
+}
+
+
+/* -------------------- */
+/* BEGIN BUTTON */
+/* -------------------- */
+
+#start-button {
+    margin-top: 20px;
+
+    padding: 17px 38px;
+
+    border: 3px solid #ded9c8;
+
+    background: transparent;
+
+    color: #eeeadd;
+
+    font-family: "Stardos Stencil", serif;
+
+    font-size: 23px;
+
+    font-weight: 700;
+
+    letter-spacing: 3px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s,
+        color 0.15s,
+        transform 0.15s;
+}
+
+
+#start-button:hover {
+    background: #ded9c8;
+
+    color: #10110c;
+
+    transform: scale(1.04);
+}
+
+
+#start-button:active {
+    transform: scale(0.98);
+}
+
+
+/* -------------------- */
+/* CONTROLS */
+/* -------------------- */
+
+.controls-text {
+    margin-top: 35px !important;
+
+    font-size: 15px !important;
+
+    line-height: 1.7;
+
+    letter-spacing: 2px !important;
+
+    color: #858573 !important;
+}
+
+
+/* -------------------- */
+/* CROSSHAIR */
+/* -------------------- */
+
+#crosshair {
+    position: fixed;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 300;
+
+    pointer-events: none;
+
+    display: none;
+
+    z-index: 50;
+
+    text-shadow: 0 0 4px black;
+}
+
+
+/* -------------------- */
+/* THREE.JS CANVAS */
+/* -------------------- */
+
+canvas {
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+}
+
+
+/* -------------------- */
+/* PHONE SUPPORT */
+/* -------------------- */
+
+@media (max-width: 600px) {
+
+    .start-box {
+        padding: 35px 20px;
+    }
+
+    .small-text {
+        font-size: 13px;
+
+        letter-spacing: 3px;
+    }
+
+    .start-box > p {
+        font-size: 16px;
+    }
+
+    #start-button {
+        font-size: 18px;
+
+        padding: 14px 24px;
+    }
+
+    .controls-text {
+        font-size: 12px !important;
+    }
+}
