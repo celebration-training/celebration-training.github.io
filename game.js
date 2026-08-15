@@ -821,9 +821,6 @@ function classroomTable(
     z
 ) {
 
-    // ROTATED TABLE
-    // LONG SIDE RUNS TOWARD / AWAY FROM TV
-
     createTable(
         x,
         z,
@@ -831,20 +828,38 @@ function classroomTable(
     );
 
 
-    // ==================================================
-    // FOUR STUDENT CHAIRS
-    //
-    // ALL FOUR ARE ON THE SIDE AWAY FROM THE TV.
-    //
-    // THEY ALL FACE LEFT TOWARD THE TV.
-    // ==================================================
-
+    // TWO CHAIRS ON THE LEFT SIDE
+    // facing inward toward the table
 
     createChair(
-        x + 1.25,
-        z - 1.15,
+        x - 1.2,
+        z - 0.7,
+        -Math.PI / 2
+    );
+
+    createChair(
+        x - 1.2,
+        z + 0.7,
+        -Math.PI / 2
+    );
+
+
+    // TWO CHAIRS ON THE RIGHT SIDE
+    // facing inward toward the table
+
+    createChair(
+        x + 1.2,
+        z - 0.7,
         Math.PI / 2
     );
+
+    createChair(
+        x + 1.2,
+        z + 0.7,
+        Math.PI / 2
+    );
+
+}
 
 
     createChair(
