@@ -1061,7 +1061,18 @@ function createStudent(
         student
     );
 
+// BACK HAIR
 
+makeBox(
+    0.36,
+    0.28,
+    0.10,
+    hair,
+    0,
+    1.45,
+    0.17,
+    student
+);
     // ARMS
 
     const leftArm =
