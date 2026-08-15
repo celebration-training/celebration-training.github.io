@@ -864,18 +864,6 @@ function classroomTable(
 
  
 
-    createChair(
-        x + 1.25,
-        z + 0.38,
-        Math.PI / 2
-    );
-
-
-    createChair(
-        x + 1.25,
-        z + 1.15,
-        Math.PI / 2
-    );
 
 
 
