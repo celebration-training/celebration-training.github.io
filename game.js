@@ -53,7 +53,9 @@ renderer.setPixelRatio(
 );
 
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+renderer.shadowMap.type =
+    THREE.PCFSoftShadowMap;
 
 document.body.appendChild(
     renderer.domElement
@@ -64,19 +66,26 @@ document.body.appendChild(
 // POINTER LOCK
 // ======================================================
 
-const controls = new PointerLockControls(
-    camera,
-    document.body
-);
+const controls =
+    new PointerLockControls(
+        camera,
+        document.body
+    );
 
 const startScreen =
-    document.getElementById("start-screen");
+    document.getElementById(
+        "start-screen"
+    );
 
 const startButton =
-    document.getElementById("start-button");
+    document.getElementById(
+        "start-button"
+    );
 
 const crosshair =
-    document.getElementById("crosshair");
+    document.getElementById(
+        "crosshair"
+    );
 
 let gameStarted = false;
 
@@ -97,16 +106,15 @@ controls.addEventListener(
     "lock",
     () => {
 
-        startScreen.style.display = "none";
+        startScreen.style.display =
+            "none";
 
-        crosshair.style.display = "block";
+        crosshair.style.display =
+            "block";
 
     }
 );
 
-
-// Losing mouse lock will NOT return you
-// to the beginning screen.
 
 controls.addEventListener(
     "unlock",
@@ -114,17 +122,17 @@ controls.addEventListener(
 
         if (gameStarted) {
 
-            startScreen.style.display = "none";
+            startScreen.style.display =
+                "none";
 
-            crosshair.style.display = "none";
+            crosshair.style.display =
+                "none";
 
         }
 
     }
 );
 
-
-// Click the game again to regain mouse control.
 
 renderer.domElement.addEventListener(
     "click",
@@ -230,7 +238,7 @@ const lightMaterial =
 
 
 // ======================================================
-// BOX CREATOR
+// BOX MAKER
 // ======================================================
 
 function makeBox(
@@ -279,11 +287,13 @@ function makeBox(
 
 
 // ======================================================
-// ROOM DIMENSIONS
+// ROOM SIZE
 // ======================================================
 
 const roomWidth = 14;
+
 const roomDepth = 20;
+
 const roomHeight = 4;
 
 
@@ -348,6 +358,7 @@ makeBox(
 
 
 // LEFT WALL
+// THIS IS THE TV / WINDOW WALL
 
 makeBox(
     0.2,
@@ -374,21 +385,6 @@ makeBox(
 
 
 // ======================================================
-// TV / BLACK SCREEN
-// ======================================================
-
-makeBox(
-    5,
-    2.4,
-    0.15,
-    blackMaterial,
-    2.7,
-    2.2,
-    -9.82
-);
-
-
-// ======================================================
 // DOOR
 // ======================================================
 
@@ -403,7 +399,7 @@ makeBox(
 );
 
 
-// Door window
+// DOOR WINDOW
 
 makeBox(
     0.65,
@@ -422,12 +418,12 @@ makeBox(
 
 function createWindow(z) {
 
-    // window
+    // WINDOW SURFACE
 
     makeBox(
         0.08,
         1.8,
-        4.2,
+        4.4,
         windowMaterial,
         -6.88,
         2.2,
@@ -435,7 +431,7 @@ function createWindow(z) {
     );
 
 
-    // blinds
+    // BLIND SLATS
 
     const slats = 12;
 
@@ -447,13 +443,14 @@ function createWindow(z) {
     ) {
 
         const y =
-            1.4 + i * 0.145;
+            1.4 +
+            i * 0.145;
 
 
         makeBox(
             0.1,
             0.035,
-            4,
+            4.2,
             blindMaterial,
             -6.80,
             y,
@@ -465,13 +462,40 @@ function createWindow(z) {
 }
 
 
-createWindow(-4.4);
+// ONE WINDOW ON EACH SIDE OF TV
 
-createWindow(3.5);
+createWindow(
+    -3.8
+);
+
+createWindow(
+    3.8
+);
 
 
 // ======================================================
-// COLLIDERS
+// TV
+// ======================================================
+
+// TV IS SLIGHTLY FARTHER INTO THE ROOM
+// THAN THE BLINDS.
+//
+// THIS MAKES IT LOOK LIKE IT IS ON THE
+// LAYER ABOVE THEM.
+
+makeBox(
+    0.18,
+    2.35,
+    4.8,
+    blackMaterial,
+    -6.65,
+    2.2,
+    0
+);
+
+
+// ======================================================
+// COLLISION DATA
 // ======================================================
 
 const colliders = [];
@@ -486,13 +510,17 @@ function addCollider(
 
     colliders.push({
 
-        minX: x - width / 2,
+        minX:
+            x - width / 2,
 
-        maxX: x + width / 2,
+        maxX:
+            x + width / 2,
 
-        minZ: z - depth / 2,
+        minZ:
+            z - depth / 2,
 
-        maxZ: z + depth / 2
+        maxZ:
+            z + depth / 2
 
     });
 
@@ -500,28 +528,45 @@ function addCollider(
 
 
 // ======================================================
-// TABLES
+// TABLE MAKER
 // ======================================================
 
 function createTable(
     x,
-    z
+    z,
+    rotation = Math.PI / 2
 ) {
 
-    // tabletop
+    const table =
+        new THREE.Group();
 
-    makeBox(
-        3.2,
-        0.16,
-        1.45,
-        tableMaterial,
-        x,
-        0.95,
-        z
+
+    // TABLETOP
+
+    const top =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                3.2,
+                0.16,
+                1.45
+            ),
+
+            tableMaterial
+
+        );
+
+
+    top.position.y =
+        0.95;
+
+
+    table.add(
+        top
     );
 
 
-    // legs
+    // LEGS
 
     const legs = [
 
@@ -539,32 +584,85 @@ function createTable(
     legs.forEach(
         ([lx, lz]) => {
 
-            makeBox(
-                0.12,
-                0.9,
-                0.12,
-                metalMaterial,
-                x + lx,
+            const leg =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        0.12,
+                        0.9,
+                        0.12
+                    ),
+
+                    metalMaterial
+
+                );
+
+
+            leg.position.set(
+                lx,
                 0.45,
-                z + lz
+                lz
+            );
+
+
+            table.add(
+                leg
             );
 
         }
     );
 
 
+    table.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    table.rotation.y =
+        rotation;
+
+
+    table.traverse(
+        object => {
+
+            if (
+                object.isMesh
+            ) {
+
+                object.castShadow =
+                    true;
+
+                object.receiveShadow =
+                    true;
+
+            }
+
+        }
+    );
+
+
+    scene.add(
+        table
+    );
+
+
+    // TABLES ARE ROTATED 90 DEGREES,
+    // SO COLLISION WIDTH/DEPTH ARE SWAPPED.
+
     addCollider(
         x,
         z,
-        3.45,
-        1.7
+        1.7,
+        3.45
     );
 
 }
 
 
 // ======================================================
-// CHAIRS
+// CHAIR MAKER
 // ======================================================
 
 function createChair(
@@ -577,7 +675,7 @@ function createChair(
         new THREE.Group();
 
 
-    // seat
+    // SEAT
 
     const seat =
         new THREE.Mesh(
@@ -593,13 +691,16 @@ function createChair(
         );
 
 
-    seat.position.y = 0.55;
+    seat.position.y =
+        0.55;
 
 
-    chair.add(seat);
+    chair.add(
+        seat
+    );
 
 
-    // back
+    // BACK
 
     const back =
         new THREE.Mesh(
@@ -622,10 +723,12 @@ function createChair(
     );
 
 
-    chair.add(back);
+    chair.add(
+        back
+    );
 
 
-    // legs
+    // LEGS
 
     const legLocations = [
 
@@ -664,7 +767,9 @@ function createChair(
             );
 
 
-            chair.add(leg);
+            chair.add(
+                leg
+            );
 
         }
     );
@@ -677,22 +782,22 @@ function createChair(
     );
 
 
-    // ==================================================
-    // FLIP EVERY CHAIR 180 DEGREES
-    // ==================================================
-
     chair.rotation.y =
-        rotation + Math.PI;
+        rotation;
 
 
     chair.traverse(
         object => {
 
-            if (object.isMesh) {
+            if (
+                object.isMesh
+            ) {
 
-                object.castShadow = true;
+                object.castShadow =
+                    true;
 
-                object.receiveShadow = true;
+                object.receiveShadow =
+                    true;
 
             }
 
@@ -700,13 +805,15 @@ function createChair(
     );
 
 
-    scene.add(chair);
+    scene.add(
+        chair
+    );
 
 }
 
 
 // ======================================================
-// TABLE + CHAIR GROUP
+// CLASSROOM TABLE + 4 CHAIRS
 // ======================================================
 
 function classroomTable(
@@ -714,34 +821,50 @@ function classroomTable(
     z
 ) {
 
+    // ROTATED TABLE
+    // LONG SIDE RUNS TOWARD / AWAY FROM TV
+
     createTable(
         x,
-        z
+        z,
+        Math.PI / 2
     );
 
 
-    // two chairs on one side
+    // ==================================================
+    // FOUR STUDENT CHAIRS
+    //
+    // ALL FOUR ARE ON THE SIDE AWAY FROM THE TV.
+    //
+    // THEY ALL FACE LEFT TOWARD THE TV.
+    // ==================================================
+
 
     createChair(
-        x - 0.8,
-        z + 1.05,
-        Math.PI
+        x + 1.25,
+        z - 1.15,
+        Math.PI / 2
     );
 
 
     createChair(
-        x + 0.8,
-        z + 1.05,
-        Math.PI
+        x + 1.25,
+        z - 0.38,
+        Math.PI / 2
     );
 
 
-    // one chair opposite
+    createChair(
+        x + 1.25,
+        z + 0.38,
+        Math.PI / 2
+    );
+
 
     createChair(
-        x,
-        z - 1.05,
-        0
+        x + 1.25,
+        z + 1.15,
+        Math.PI / 2
     );
 
 }
@@ -751,45 +874,43 @@ function classroomTable(
 // CLASSROOM LAYOUT
 // ======================================================
 
-// FRONT ROW
+// TABLES CLOSEST TO TV
 
 classroomTable(
-    -2.4,
-    -5.2
+    -2.8,
+    -5
 );
 
 
 classroomTable(
-    2.2,
-    -5.2
-);
-
-
-// MIDDLE ROW
-
-classroomTable(
-    -2.4,
-    -1.5
+    -2.8,
+    0
 );
 
 
 classroomTable(
-    2.2,
-    -1.5
+    -2.8,
+    5
 );
 
 
-// BACK ROW
+// SECOND SET OF TABLES
 
 classroomTable(
-    -2.4,
-    2.2
+    1.3,
+    -5
 );
 
 
 classroomTable(
-    2.2,
-    2.2
+    1.3,
+    0
+);
+
+
+classroomTable(
+    1.3,
+    5
 );
 
 
@@ -868,7 +989,14 @@ addCollider(
 );
 
 
-// Teacher chair
+// ======================================================
+// MRS. SISSOM'S CHAIR
+// ======================================================
+//
+// IMPORTANT:
+// WE ARE LEAVING THIS ROTATION EXACTLY
+// THE WAY IT ALREADY WAS.
+//
 
 createChair(
     4.6,
@@ -878,7 +1006,7 @@ createChair(
 
 
 // ======================================================
-// CEILING LIGHTS
+// CEILING LIGHT MAKER
 // ======================================================
 
 function createCeilingLight(
@@ -913,13 +1041,22 @@ function createCeilingLight(
     );
 
 
-    light.castShadow = true;
+    light.castShadow =
+        true;
 
 
-    scene.add(light);
+    light.shadow.bias =
+        -0.001;
+
+
+    scene.add(
+        light
+    );
 
 }
 
+
+// TWO CLASSROOM LIGHTS
 
 createCeilingLight(
     0,
@@ -934,7 +1071,7 @@ createCeilingLight(
 
 
 // ======================================================
-// GENERAL LIGHT
+// GENERAL ROOM LIGHT
 // ======================================================
 
 const hemisphere =
@@ -957,7 +1094,7 @@ scene.add(
 const sun =
     new THREE.DirectionalLight(
         0xfff4d6,
-        1.3
+        1.15
     );
 
 
@@ -968,7 +1105,16 @@ sun.position.set(
 );
 
 
-sun.castShadow = true;
+// IMPORTANT:
+//
+// THE OLD DIRECTIONAL-LIGHT SHADOW WAS
+// CAUSING THOSE GIANT TRIANGLES.
+//
+// KEEP THE LIGHT, BUT DON'T LET IT CAST
+// THE WEIRD GIANT SHADOWS.
+
+sun.castShadow =
+    false;
 
 
 scene.add(
@@ -977,7 +1123,7 @@ scene.add(
 
 
 // ======================================================
-// KEYBOARD MOVEMENT
+// KEYBOARD
 // ======================================================
 
 const keys = {};
@@ -987,7 +1133,8 @@ document.addEventListener(
     "keydown",
     event => {
 
-        keys[event.code] = true;
+        keys[event.code] =
+            true;
 
     }
 );
@@ -997,7 +1144,8 @@ document.addEventListener(
     "keyup",
     event => {
 
-        keys[event.code] = false;
+        keys[event.code] =
+            false;
 
     }
 );
@@ -1007,7 +1155,8 @@ document.addEventListener(
 // PLAYER COLLISION
 // ======================================================
 
-const playerRadius = 0.32;
+const playerRadius =
+    0.32;
 
 
 function collidingWithFurniture(
@@ -1016,7 +1165,8 @@ function collidingWithFurniture(
 ) {
 
     for (
-        const collider of colliders
+        const collider
+        of colliders
     ) {
 
         if (
@@ -1048,7 +1198,7 @@ function collidingWithFurniture(
 
 
 // ======================================================
-// KEEP PLAYER INSIDE CLASSROOM
+// KEEP PLAYER INSIDE ROOM
 // ======================================================
 
 function keepInsideRoom() {
@@ -1117,7 +1267,7 @@ function animate() {
             4.1 * delta;
 
 
-        // FORWARD
+        // W
 
         if (
             keys["KeyW"]
@@ -1130,7 +1280,7 @@ function animate() {
         }
 
 
-        // BACKWARD
+        // S
 
         if (
             keys["KeyS"]
@@ -1143,7 +1293,7 @@ function animate() {
         }
 
 
-        // LEFT
+        // A
 
         if (
             keys["KeyA"]
@@ -1156,7 +1306,7 @@ function animate() {
         }
 
 
-        // RIGHT
+        // D
 
         if (
             keys["KeyD"]
@@ -1169,12 +1319,12 @@ function animate() {
         }
 
 
-        // STOP PLAYER FROM WALKING OUTSIDE
+        // DON'T LEAVE ROOM
 
         keepInsideRoom();
 
 
-        // STOP PLAYER FROM WALKING THROUGH TABLES
+        // DON'T WALK THROUGH TABLES
 
         if (
             collidingWithFurniture(
