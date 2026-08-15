@@ -2,31 +2,42 @@ import * as THREE from "three";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 
 
-// --------------------
+// ======================================================
 // SCENE
-// --------------------
+// ======================================================
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9b9b92);
+
+scene.background = new THREE.Color(0x8f908b);
+
+scene.fog = new THREE.Fog(
+    0x8f908b,
+    18,
+    32
+);
 
 
-// --------------------
+// ======================================================
 // CAMERA
-// --------------------
+// ======================================================
 
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
-    1000
+    100
 );
 
-camera.position.set(0, 1.7, 7);
+camera.position.set(
+    0,
+    1.65,
+    8
+);
 
 
-// --------------------
+// ======================================================
 // RENDERER
-// --------------------
+// ======================================================
 
 const renderer = new THREE.WebGLRenderer({
     antialias: true
@@ -37,14 +48,21 @@ renderer.setSize(
     window.innerHeight
 );
 
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
+
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-document.body.appendChild(renderer.domElement);
+document.body.appendChild(
+    renderer.domElement
+);
 
 
-// --------------------
-// FIRST PERSON CONTROLS
-// --------------------
+// ======================================================
+// POINTER LOCK
+// ======================================================
 
 const controls = new PointerLockControls(
     camera,
@@ -60,87 +78,162 @@ const startButton =
 const crosshair =
     document.getElementById("crosshair");
 
-
-startButton.addEventListener("click", () => {
-    controls.lock();
-});
+let gameStarted = false;
 
 
-controls.addEventListener("lock", () => {
-    startScreen.style.display = "none";
-    crosshair.style.display = "block";
-});
+startButton.addEventListener(
+    "click",
+    () => {
 
+        gameStarted = true;
 
-controls.addEventListener("unlock", () => {
-    startScreen.style.display = "flex";
-    crosshair.style.display = "none";
-});
+        controls.lock();
 
-
-// --------------------
-// LIGHTING
-// --------------------
-
-const ambientLight =
-    new THREE.AmbientLight(
-        0xffffff,
-        1.4
-    );
-
-scene.add(ambientLight);
-
-
-const ceilingLight =
-    new THREE.DirectionalLight(
-        0xffffff,
-        2
-    );
-
-ceilingLight.position.set(
-    0,
-    8,
-    2
+    }
 );
 
-ceilingLight.castShadow = true;
 
-scene.add(ceilingLight);
+controls.addEventListener(
+    "lock",
+    () => {
+
+        startScreen.style.display = "none";
+
+        crosshair.style.display = "block";
+
+    }
+);
 
 
-// --------------------
+// IMPORTANT:
+//
+// Losing mouse lock will NOT throw you
+// back to the start screen anymore.
+
+controls.addEventListener(
+    "unlock",
+    () => {
+
+        if (gameStarted) {
+
+            startScreen.style.display = "none";
+
+            crosshair.style.display = "none";
+
+        }
+
+    }
+);
+
+
+// Click the game to regain mouse control.
+
+renderer.domElement.addEventListener(
+    "click",
+    () => {
+
+        if (
+            gameStarted &&
+            !controls.isLocked
+        ) {
+
+            controls.lock();
+
+        }
+
+    }
+);
+
+
+// ======================================================
 // MATERIALS
-// --------------------
+// ======================================================
 
 const wallMaterial =
     new THREE.MeshStandardMaterial({
-        color: 0xb8b8ae
+        color: 0xa7acb2,
+        roughness: 0.95
     });
+
 
 const floorMaterial =
     new THREE.MeshStandardMaterial({
-        color: 0x77776f
+        color: 0x70777d,
+        roughness: 1
     });
+
 
 const ceilingMaterial =
     new THREE.MeshStandardMaterial({
-        color: 0xd5d5cc
+        color: 0xc4c6c7,
+        roughness: 1
     });
 
-const woodMaterial =
+
+const tableMaterial =
     new THREE.MeshStandardMaterial({
-        color: 0x7a5235
+        color: 0x95662d,
+        roughness: 0.8
     });
+
+
+const metalMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x555b60,
+        roughness: 0.7
+    });
+
+
+const chairMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x25292d,
+        roughness: 0.9
+    });
+
 
 const blackMaterial =
     new THREE.MeshStandardMaterial({
-        color: 0x1c1c1c
+        color: 0x090909,
+        roughness: 0.7
     });
 
 
-// --------------------
-// HELPER FUNCTION
-// --------------------
+const doorMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x85613d,
+        roughness: 0.8
+    });
+
+
+const blindMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0xc8cdd0,
+        roughness: 0.7
+    });
+
+
+const windowMaterial =
+    new THREE.MeshStandardMaterial({
+        color: 0x889ba5,
+        roughness: 0.2
+    });
+
+
+const lightMaterial =
+    new THREE.MeshStandardMaterial({
+
+        color: 0xffffff,
+
+        emissive: 0xffffff,
+
+        emissiveIntensity: 1.5
+
+    });
+
+
+// ======================================================
+// BOX CREATOR
+// ======================================================
 
 function makeBox(
     width,
@@ -159,84 +252,109 @@ function makeBox(
             depth
         );
 
-    const object =
+
+    const mesh =
         new THREE.Mesh(
             geometry,
             material
         );
 
-    object.position.set(
+
+    mesh.position.set(
         x,
         y,
         z
     );
 
-    object.castShadow = true;
-    object.receiveShadow = true;
 
-    scene.add(object);
+    mesh.castShadow = true;
 
-    return object;
+    mesh.receiveShadow = true;
+
+
+    scene.add(mesh);
+
+
+    return mesh;
+
 }
 
 
-// --------------------
-// ROOM
-// --------------------
+// ======================================================
+// ROOM DIMENSIONS
+// ======================================================
 
-// floor
+const roomWidth = 14;
+const roomDepth = 20;
+const roomHeight = 4;
+
+
+// ======================================================
+// FLOOR
+// ======================================================
+
 makeBox(
-    14,
+    roomWidth,
     0.2,
-    18,
+    roomDepth,
     floorMaterial,
     0,
-    0,
+    -0.1,
     0
 );
 
 
-// ceiling
+// ======================================================
+// CEILING
+// ======================================================
+
 makeBox(
-    14,
+    roomWidth,
     0.2,
-    18,
+    roomDepth,
     ceilingMaterial,
     0,
-    4,
+    roomHeight,
     0
 );
 
 
-// back wall
+// ======================================================
+// WALLS
+// ======================================================
+
+// FRONT WALL
+
 makeBox(
-    14,
-    4,
+    roomWidth,
+    roomHeight,
     0.2,
     wallMaterial,
     0,
     2,
-    -9
+    -10
 );
 
 
-// front wall
+// BACK WALL
+
 makeBox(
-    14,
-    4,
+    roomWidth,
+    roomHeight,
     0.2,
     wallMaterial,
     0,
     2,
-    9
+    10
 );
 
 
-// left wall
+// LEFT WALL
+
 makeBox(
     0.2,
-    4,
-    18,
+    roomHeight,
+    roomDepth,
     wallMaterial,
     -7,
     2,
@@ -244,11 +362,12 @@ makeBox(
 );
 
 
-// right wall
+// RIGHT WALL
+
 makeBox(
     0.2,
-    4,
-    18,
+    roomHeight,
+    roomDepth,
     wallMaterial,
     7,
     2,
@@ -256,195 +375,804 @@ makeBox(
 );
 
 
-// --------------------
-// SCREEN / BOARD
-// --------------------
+// ======================================================
+// TV / BLACK SCREEN
+// ======================================================
 
 makeBox(
     5,
-    2.5,
+    2.4,
     0.15,
     blackMaterial,
-    0,
+    2.7,
     2.2,
-    -8.8
+    -9.82
 );
 
 
-// --------------------
-// TABLE FUNCTION
-// --------------------
+// ======================================================
+// DOOR
+// ======================================================
 
-function createTable(x, z) {
+makeBox(
+    1.8,
+    3.1,
+    0.12,
+    doorMaterial,
+    -4.5,
+    1.55,
+    -9.83
+);
+
+
+// Door window
+
+makeBox(
+    0.65,
+    1.25,
+    0.05,
+    windowMaterial,
+    -4.5,
+    2.05,
+    -9.74
+);
+
+
+// ======================================================
+// WINDOWS + BLINDS
+// ======================================================
+
+function createWindow(z) {
+
+    // window
 
     makeBox(
-        3,
-        0.18,
-        1.5,
-        woodMaterial,
-        x,
-        1,
+        0.08,
+        1.8,
+        4.2,
+        windowMaterial,
+        -6.88,
+        2.2,
         z
     );
 
-    const legPositions = [
-        [-1.25, -0.55],
-        [1.25, -0.55],
-        [-1.25, 0.55],
-        [1.25, 0.55]
-    ];
 
-    legPositions.forEach(([lx, lz]) => {
+    // blinds
+
+    const slats = 12;
+
+
+    for (
+        let i = 0;
+        i < slats;
+        i++
+    ) {
+
+        const y =
+            1.4 + i * 0.145;
+
 
         makeBox(
-            0.12,
-            1,
-            0.12,
-            blackMaterial,
-            x + lx,
-            0.5,
-            z + lz
+            0.1,
+            0.035,
+            4,
+            blindMaterial,
+            -6.80,
+            y,
+            z
         );
 
-    });
+    }
+
 }
 
 
-// --------------------
-// CLASSROOM TABLES
-// --------------------
+createWindow(-4.4);
 
-createTable(-3.5, -3);
-createTable(0, -3);
-createTable(3.5, -3);
-
-createTable(-3.5, 1);
-createTable(0, 1);
-createTable(3.5, 1);
+createWindow(3.5);
 
 
-// --------------------
+// ======================================================
+// TABLES
+// ======================================================
+
+const colliders = [];
+
+
+function addCollider(
+    x,
+    z,
+    width,
+    depth
+) {
+
+    colliders.push({
+
+        minX: x - width / 2,
+
+        maxX: x + width / 2,
+
+        minZ: z - depth / 2,
+
+        maxZ: z + depth / 2
+
+    });
+
+}
+
+
+function createTable(
+    x,
+    z
+) {
+
+    // tabletop
+
+    makeBox(
+        3.2,
+        0.16,
+        1.45,
+        tableMaterial,
+        x,
+        0.95,
+        z
+    );
+
+
+    // legs
+
+    const legs = [
+
+        [-1.35, -0.55],
+
+        [1.35, -0.55],
+
+        [-1.35, 0.55],
+
+        [1.35, 0.55]
+
+    ];
+
+
+    legs.forEach(
+        ([lx, lz]) => {
+
+            makeBox(
+                0.12,
+                0.9,
+                0.12,
+                metalMaterial,
+                x + lx,
+                0.45,
+                z + lz
+            );
+
+        }
+    );
+
+
+    addCollider(
+        x,
+        z,
+        3.45,
+        1.7
+    );
+
+}
+
+
+// ======================================================
+// CHAIRS
+// ======================================================
+
+function createChair(
+    x,
+    z,
+    rotation = 0
+) {
+
+    const chair =
+        new THREE.Group();
+
+
+    // seat
+
+    const seat =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                0.65,
+                0.12,
+                0.65
+            ),
+
+            chairMaterial
+
+        );
+
+
+    seat.position.y = 0.55;
+
+
+    chair.add(seat);
+
+
+    // back
+
+    const back =
+        new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+                0.65,
+                0.75,
+                0.12
+            ),
+
+            chairMaterial
+
+        );
+
+
+    back.position.set(
+        0,
+        0.95,
+        0.28
+    );
+
+
+    chair.add(back);
+
+
+    // legs
+
+    const legLocations = [
+
+        [-0.24, -0.24],
+
+        [0.24, -0.24],
+
+        [-0.24, 0.24],
+
+        [0.24, 0.24]
+
+    ];
+
+
+    legLocations.forEach(
+        ([lx, lz]) => {
+
+            const leg =
+                new THREE.Mesh(
+
+                    new THREE.BoxGeometry(
+                        0.07,
+                        0.55,
+                        0.07
+                    ),
+
+                    metalMaterial
+
+                );
+
+
+            leg.position.set(
+                lx,
+                0.275,
+                lz
+            );
+
+
+            chair.add(leg);
+
+        }
+    );
+
+
+    chair.position.set(
+        x,
+        0,
+        z
+    );
+
+
+    chair.rotation.y = rotation;
+
+
+    chair.traverse(
+        object => {
+
+            if (object.isMesh) {
+
+                object.castShadow = true;
+
+                object.receiveShadow = true;
+
+            }
+
+        }
+    );
+
+
+    scene.add(chair);
+
+}
+
+
+// ======================================================
+// TABLE + CHAIR GROUP
+// ======================================================
+
+function classroomTable(
+    x,
+    z
+) {
+
+    createTable(
+        x,
+        z
+    );
+
+
+    // two chairs on one side
+
+    createChair(
+        x - 0.8,
+        z + 1.05,
+        Math.PI
+    );
+
+
+    createChair(
+        x + 0.8,
+        z + 1.05,
+        Math.PI
+    );
+
+
+    // one chair opposite
+
+    createChair(
+        x,
+        z - 1.05,
+        0
+    );
+
+}
+
+
+// ======================================================
+// CLASSROOM LAYOUT
+// ======================================================
+
+// Front row
+
+classroomTable(
+    -2.4,
+    -5.2
+);
+
+
+classroomTable(
+    2.2,
+    -5.2
+);
+
+
+// Middle row
+
+classroomTable(
+    -2.4,
+    -1.5
+);
+
+
+classroomTable(
+    2.2,
+    -1.5
+);
+
+
+// Back row
+
+classroomTable(
+    -2.4,
+    2.2
+);
+
+
+classroomTable(
+    2.2,
+    2.2
+);
+
+
+// ======================================================
 // MRS. SISSOM'S DESK
-// --------------------
+// ======================================================
+
+// opposite back corner
 
 makeBox(
-    3.5,
-    0.2,
-    1.7,
-    woodMaterial,
-    4.7,
-    1,
-    6.5
+    3.7,
+    0.18,
+    1.8,
+    tableMaterial,
+    4.6,
+    0.95,
+    7.6
 );
 
 
-// desk legs
-
 makeBox(
-    0.15,
-    1,
-    0.15,
-    blackMaterial,
-    3.2,
-    0.5,
-    6
+    0.14,
+    0.9,
+    0.14,
+    metalMaterial,
+    3,
+    0.45,
+    6.9
 );
 
+
 makeBox(
-    0.15,
-    1,
-    0.15,
-    blackMaterial,
+    0.14,
+    0.9,
+    0.14,
+    metalMaterial,
     6.2,
-    0.5,
-    6
+    0.45,
+    6.9
 );
 
-makeBox(
-    0.15,
-    1,
-    0.15,
-    blackMaterial,
-    3.2,
-    0.5,
-    7
-);
 
 makeBox(
-    0.15,
-    1,
-    0.15,
-    blackMaterial,
+    0.14,
+    0.9,
+    0.14,
+    metalMaterial,
+    3,
+    0.45,
+    8.3
+);
+
+
+makeBox(
+    0.14,
+    0.9,
+    0.14,
+    metalMaterial,
     6.2,
-    0.5,
-    7
+    0.45,
+    8.3
 );
 
 
-// --------------------
+addCollider(
+    4.6,
+    7.6,
+    4,
+    2.1
+);
+
+
+// Teacher chair
+
+createChair(
+    4.6,
+    8.8,
+    Math.PI
+);
+
+
+// ======================================================
+// CEILING LIGHTS
+// ======================================================
+
+function createCeilingLight(
+    x,
+    z
+) {
+
+    makeBox(
+        2.2,
+        0.05,
+        0.65,
+        lightMaterial,
+        x,
+        3.88,
+        z
+    );
+
+
+    const light =
+        new THREE.PointLight(
+            0xffffff,
+            22,
+            12,
+            2
+        );
+
+
+    light.position.set(
+        x,
+        3.6,
+        z
+    );
+
+
+    light.castShadow = true;
+
+
+    scene.add(light);
+
+}
+
+
+createCeilingLight(
+    0,
+    -4
+);
+
+
+createCeilingLight(
+    0,
+    3
+);
+
+
+// ======================================================
+// GENERAL LIGHT
+// ======================================================
+
+const hemisphere =
+    new THREE.HemisphereLight(
+        0xffffff,
+        0x555555,
+        1.35
+    );
+
+
+scene.add(
+    hemisphere
+);
+
+
+// sunlight
+
+const sun =
+    new THREE.DirectionalLight(
+        0xfff4d6,
+        1.3
+    );
+
+
+sun.position.set(
+    -8,
+    6,
+    5
+);
+
+
+sun.castShadow = true;
+
+
+scene.add(
+    sun
+);
+
+
+// ======================================================
 // MOVEMENT
-// --------------------
+// ======================================================
 
 const keys = {};
+
 
 document.addEventListener(
     "keydown",
     event => {
+
         keys[event.code] = true;
+
     }
 );
+
 
 document.addEventListener(
     "keyup",
     event => {
+
         keys[event.code] = false;
+
     }
 );
 
 
-const clock = new THREE.Clock();
+// ======================================================
+// COLLISION
+// ======================================================
+
+const playerRadius = 0.32;
 
 
-// --------------------
+function collidingWithFurniture(
+    x,
+    z
+) {
+
+    for (
+        const collider of colliders
+    ) {
+
+        if (
+
+            x + playerRadius >
+            collider.minX &&
+
+            x - playerRadius <
+            collider.maxX &&
+
+            z + playerRadius >
+            collider.minZ &&
+
+            z - playerRadius <
+            collider.maxZ
+
+        ) {
+
+            return true;
+
+        }
+
+    }
+
+
+    return false;
+
+}
+
+
+function keepInsideRoom() {
+
+    camera.position.x =
+        THREE.MathUtils.clamp(
+            camera.position.x,
+            -6.55,
+            6.55
+        );
+
+
+    camera.position.z =
+        THREE.MathUtils.clamp(
+            camera.position.z,
+            -9.5,
+            9.5
+        );
+
+
+    camera.position.y = 1.65;
+
+}
+
+
+// ======================================================
 // GAME LOOP
-// --------------------
+// ======================================================
+
+const clock =
+    new THREE.Clock();
+
 
 function animate() {
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+        animate
+    );
 
-    const delta = clock.getDelta();
 
-    const speed = 5 * delta;
+    const delta =
+        Math.min(
+            clock.getDelta(),
+            0.05
+        );
 
-    if (controls.isLocked) {
 
-        if (keys["KeyW"])
-            controls.moveForward(speed);
+    if (
+        controls.isLocked
+    ) {
 
-        if (keys["KeyS"])
-            controls.moveForward(-speed);
+        const previousX =
+            camera.position.x;
 
-        if (keys["KeyA"])
-            controls.moveRight(-speed);
 
-        if (keys["KeyD"])
-            controls.moveRight(speed);
+        const previousZ =
+            camera.position.z;
+
+
+        const movementSpeed =
+            4.1 * delta;
+
+
+        if (
+            keys["KeyW"]
+        ) {
+
+            controls.moveForward(
+                movementSpeed
+            );
+
+        }
+
+
+        if (
+            keys["KeyS"]
+        ) {
+
+            controls.moveForward(
+                -movementSpeed
+            );
+
+        }
+
+
+        if (
+            keys["KeyA"]
+        ) {
+
+            controls.moveRight(
+                -movementSpeed
+            );
+
+        }
+
+
+        if (
+            keys["KeyD"]
+        ) {
+
+            controls.moveRight(
+                movementSpeed
+            );
+
+        }
+
+
+        keepInsideRoom();
+
+
+        if (
+            collidingWithFurniture(
+                camera.position.x,
+                camera.position.z
+            )
+        ) {
+
+            camera.position.x =
+                previousX;
+
+
+            camera.position.z =
+                previousZ;
+
+        }
 
     }
+
 
     renderer.render(
         scene,
         camera
     );
+
 }
+
 
 animate();
 
 
-// --------------------
+// ======================================================
 // WINDOW RESIZE
-// --------------------
+// ======================================================
 
 window.addEventListener(
     "resize",
@@ -454,7 +1182,9 @@ window.addEventListener(
             window.innerWidth /
             window.innerHeight;
 
+
         camera.updateProjectionMatrix();
+
 
         renderer.setSize(
             window.innerWidth,
